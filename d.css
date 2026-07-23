@@ -1,643 +1,215 @@
-
 :root {
-    --macos-ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);      /* 标准缓动 */
-    --macos-ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);    /* 减速缓动 */
-    --macos-ease-accelerate: cubic-bezier(0.4, 0.0, 1.0, 1.0);  /* 加速缓动 */
-    --macos-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弹性效果 */
-    --macos-ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1.0);   /* 平滑缓动 */
+    --macos-ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --macos-ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --macos-ease-accelerate: cubic-bezier(0.4, 0.0, 1.0, 1.0);
+    --macos-ease-spring: cubic-bezier(0.25, 0.1, 0.25, 1.0);   /* 平滑替代 */
+    --macos-ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1.0);
 
     --duration-instant: 0.1s;
     --duration-fast: 0.3s;
     --duration-normal: 0.6s;
-    --duration-slow: 1.0s;      
-    --duration-slower: 1.2s;   
-    --duration-slowest: 1.5s;  
+    --duration-slow: 1.0s;
+    --duration-slower: 1.2s;
+    --duration-slowest: 1.5s;
 
     --will-change-transform: transform;
     --will-change-opacity: opacity;
     --gpu-accelerated: translateZ(0);
 }
 
-/* ========== 开机动画 ========== */
+/* ===== 开机动画（平滑） ===== */
 @keyframes bootFadeIn {
-    0% { 
-        opacity: 0; 
-        transform: scale(0.96) translateY(10px);
-        filter: blur(2px);
-    }
-    40% {
-        opacity: 0.6;
-        transform: scale(0.98) translateY(5px);
-        filter: blur(1px);
-    }
-    100% { 
-        opacity: 1; 
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: scale(0.96) translateY(10px); filter: blur(2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
-
 @keyframes logoPulse {
-    0%, 100% { 
-        opacity: 0.85; 
-        transform: scale(1);
-        text-shadow: 0 0 8px rgba(255,255,255,0.2);
-    }
-    50% { 
-        opacity: 1; 
-        transform: scale(1.02);
-        text-shadow: 0 0 20px rgba(255,255,255,0.5);
-    }
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
 }
-
 @keyframes progressShimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
 
-/* ========== 菜单栏动画 (1.0秒) ========== */
+/* ===== 菜单栏 ===== */
 @keyframes menuBarSlideDown {
-    0% { 
-        opacity: 0;
-        transform: translateY(-100%);
-    }
-    60% {
-        opacity: 1;
-        transform: translateY(5%);
-    }
-    100% { 
-        opacity: 1;
-        transform: translateY(0);
-    }
+    0% { opacity: 0; transform: translateY(-100%); }
+    100% { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes submenuReveal {
-    0% { 
-        opacity: 0;
-        transform: scale(0.96) translateY(-8px);
-        filter: blur(4px);
-    }
-    100% { 
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: scale(0.96) translateY(-8px); filter: blur(4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
 
-/* ========== Dock动画系统 (1.2秒) ========== */
+/* ===== Dock（平滑出现，无弹跳） ===== */
 @keyframes dockSlideUp {
-    0% { 
-        opacity: 0;
-        transform: translateY(100%) scaleY(0.8);
-    }
-    40% {
-        opacity: 0.8;
-        transform: translateY(-5%) scaleY(1.02);
-    }
-    70% {
-        transform: translateY(2%) scaleY(0.99);
-    }
-    100% { 
-        opacity: 1;
-        transform: translateY(0) scaleY(1);
-    }
+    0% { opacity: 0; transform: translateY(100%) scaleY(0.9); }
+    100% { opacity: 1; transform: translateY(0) scaleY(1); }
 }
-
 @keyframes dockItemPop {
-    0% { 
-        opacity: 0; 
-        transform: scale(0.6) translateY(30px);
-        filter: blur(8px);
-    }
-    50% {
-        opacity: 0.9;
-        transform: scale(1.05) translateY(-5px);
-        filter: blur(2px);
-    }
-    75% {
-        transform: scale(0.98) translateY(2px);
-        filter: blur(0);
-    }
-    100% { 
-        opacity: 1; 
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: scale(0.7) translateY(20px); filter: blur(6px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
-
+/* Dock 弹跳改为平滑缩放 */
 @keyframes dockBounce {
-    0%, 100% { transform: scale(1) translateY(0); }
-    25% { transform: scale(1.15) translateY(-12px); }
-    50% { transform: scale(1.08) translateY(-6px); }
-    75% { transform: scale(1.02) translateY(-2px); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
 }
-
 @keyframes badgeAppear {
-    0% { 
-        opacity: 0;
-        transform: scale(0) translateY(10px);
-    }
-    40% {
-        opacity: 1;
-        transform: scale(1.2) translateY(-3px);
-    }
-    70% {
-        transform: scale(0.95) translateY(1px);
-    }
-    100% { 
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+    0% { opacity: 0; transform: scale(0); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
-/* ========== 窗口动画系统 (1.2-1.5秒) ========== */
+/* ===== 窗口动画（全部平滑，无弹跳） ===== */
 @keyframes windowOpen {
-    0% { 
-        opacity: 0; 
-        transform: scale(0.88) translateY(40px);
-        filter: blur(12px);
-    }
-    30% {
-        opacity: 0.6;
-        transform: scale(0.95) translateY(15px);
-        filter: blur(6px);
-    }
-    60% {
-        opacity: 0.9;
-        transform: scale(1.02) translateY(-5px);
-        filter: blur(2px);
-    }
-    85% {
-        transform: scale(0.995) translateY(2px);
-        filter: blur(0);
-    }
-    100% { 
-        opacity: 1; 
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: scale(0.88) translateY(40px); filter: blur(12px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
-
 @keyframes windowClose {
-    0% { 
-        opacity: 1; 
-        transform: scale(1);
-        filter: blur(0);
-    }
-    30% {
-        opacity: 0.8;
-        transform: scale(1.02);
-        filter: blur(2px);
-    }
-    70% {
-        opacity: 0.3;
-        transform: scale(0.9);
-        filter: blur(6px);
-    }
-    100% { 
-        opacity: 0; 
-        transform: scale(0.85);
-        filter: blur(12px);
-    }
+    0% { opacity: 1; transform: scale(1); filter: blur(0); }
+    100% { opacity: 0; transform: scale(0.85); filter: blur(12px); }
 }
-
-/* Genie Effect */
+/* 最小化/恢复：无 skew，无 clip-path，纯平滑缩放位移 */
 @keyframes windowMinimizeGenie {
-    0% {
-        opacity: 1;
-        transform: scale(1) translateY(0) skewX(0deg);
-        filter: blur(0);
-        clip-path: inset(0 0 0 0);
-    }
-    25% {
-        opacity: 0.9;
-        transform: scale(0.95) translateY(10px) skewX(-2deg);
-        filter: blur(1px);
-    }
-    50% {
-        opacity: 0.7;
-        transform: scale(0.6) translateY(60px) skewX(-8deg);
-        filter: blur(3px);
-        clip-path: inset(20% 10% 40% 10%);
-    }
-    75% {
-        opacity: 0.4;
-        transform: scale(0.3) translateY(100px) skewX(-15deg);
-        filter: blur(6px);
-        clip-path: inset(40% 20% 50% 20%);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.1) translateY(150px) skewX(-20deg);
-        filter: blur(12px);
-        clip-path: inset(45% 25% 45% 25%);
-    }
+    0% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    100% { opacity: 0; transform: scale(0.05) translateY(150px); filter: blur(12px); }
 }
-
 @keyframes windowRestoreFromDock {
-    0% {
-        opacity: 0;
-        transform: scale(0.1) translateY(150px) skewX(20deg);
-        filter: blur(12px);
-        clip-path: inset(45% 25% 45% 25%);
-    }
-    25% {
-        opacity: 0.4;
-        transform: scale(0.3) translateY(100px) skewX(15deg);
-        filter: blur(6px);
-        clip-path: inset(40% 20% 50% 20%);
-    }
-    50% {
-        opacity: 0.7;
-        transform: scale(0.6) translateY(60px) skewX(8deg);
-        filter: blur(3px);
-        clip-path: inset(20% 10% 40% 10%);
-    }
-    75% {
-        opacity: 0.9;
-        transform: scale(0.95) translateY(10px) skewX(2deg);
-        filter: blur(1px);
-    }
-    90% {
-        opacity: 1;
-        transform: scale(1.02) translateY(-3px) skewX(0deg);
-        filter: blur(0);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) translateY(0) skewX(0deg);
-        filter: blur(0);
-        clip-path: inset(0 0 0 0);
-    }
+    0% { opacity: 0; transform: scale(0.05) translateY(150px); filter: blur(12px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
-
 @keyframes windowFullscreen {
-    0% {
-        opacity: 0.8;
-        transform: scale(0.95);
-        border-radius: 12px;
-    }
-    40% {
-        opacity: 1;
-        transform: scale(1.01);
-    }
-    70% {
-        transform: scale(0.998);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-        border-radius: 0;
-    }
+    0% { opacity: 0.9; transform: scale(0.95); border-radius: 12px; }
+    100% { opacity: 1; transform: scale(1); border-radius: 0; }
 }
-
 @keyframes windowExitFullscreen {
-    0% {
-        opacity: 0.9;
-        transform: scale(1.02);
-        border-radius: 0;
-    }
-    50% {
-        opacity: 1;
-        transform: scale(0.98);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-        border-radius: 12px;
-    }
+    0% { opacity: 0.9; transform: scale(1.02); border-radius: 0; }
+    100% { opacity: 1; transform: scale(1); border-radius: 12px; }
 }
-
 @keyframes windowFocusPulse {
-    0%, 100% { 
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-    }
-    50% { 
-        box-shadow: 0 16px 48px rgba(0,0,0,0.2);
-    }
+    0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    50% { box-shadow: 0 16px 48px rgba(0,0,0,0.2); }
 }
 
-/* ========== 桌面图标动画 (1.0秒) ========== */
+/* ===== 桌面图标 ===== */
 @keyframes iconFadeInStagger {
-    0% { 
-        opacity: 0; 
-        transform: translateY(20px) scale(0.9);
-        filter: blur(4px);
-    }
-    60% {
-        opacity: 0.8;
-        transform: translateY(-3px) scale(1.02);
-        filter: blur(1px);
-    }
-    100% { 
-        opacity: 1; 
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(4px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
-
 @keyframes iconSelect {
     0% { transform: scale(1); }
-    40% { transform: scale(1.08); }
-    70% { transform: scale(0.98); }
+    50% { transform: scale(1.06); }
     100% { transform: scale(1); }
 }
 
-/* ========== 右键菜单动画 (1.0秒) ========== */
+/* ===== 右键菜单 ===== */
 @keyframes contextMenuAppear {
-    0% { 
-        opacity: 0;
-        transform: scale(0.92) translateY(-10px);
-        filter: blur(8px);
-    }
-    50% {
-        opacity: 0.9;
-        transform: scale(1.01) translateY(2px);
-        filter: blur(2px);
-    }
-    75% {
-        transform: scale(0.995) translateY(-1px);
-    }
-    100% { 
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: scale(0.92) translateY(-10px); filter: blur(8px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
 
-/* ========== 控制中心动画 (1.2秒) ========== */
+/* ===== 控制中心 ===== */
 @keyframes controlCenterSlide {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.95);
-        filter: blur(12px);
-    }
-    40% {
-        opacity: 0.8;
-        transform: translateY(5px) scale(1.01);
-        filter: blur(4px);
-    }
-    70% {
-        transform: translateY(-2px) scale(0.998);
-        filter: blur(1px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-    }
+    0% { opacity: 0; transform: translateY(-20px) scale(0.95); filter: blur(12px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
-
 @keyframes moduleStagger {
-    0% {
-        opacity: 0;
-        transform: translateX(-15px) scale(0.96);
-    }
-    60% {
-        opacity: 1;
-        transform: translateX(3px) scale(1.01);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-    }
+    0% { opacity: 0; transform: translateX(-15px) scale(0.96); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
 }
 
-/* ========== Siri界面动画 (1.5秒) ========== */
+/* ===== Siri ===== */
 @keyframes siriOrbPulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.8;
-        filter: blur(0);
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 1;
-        filter: blur(2px);
-    }
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.08); opacity: 1; }
 }
-
 @keyframes siriInterfaceReveal {
-    0% {
-        opacity: 0;
-        transform: scale(0.9) translateY(30px);
-        backdrop-filter: blur(0);
-    }
-    40% {
-        opacity: 0.9;
-        transform: scale(1.02) translateY(-5px);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        backdrop-filter: blur(20px);
-    }
+    0% { opacity: 0; transform: scale(0.9) translateY(30px); backdrop-filter: blur(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); backdrop-filter: blur(20px); }
 }
 
-/* ========== 拖拽/调整大小视觉反馈 (1.0秒) ========== */
+/* ===== 拖拽/调整大小 ===== */
 @keyframes dragLift {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    100% {
-        transform: scale(1.02);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    }
+    0% { transform: scale(1); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    100% { transform: scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
 }
-
 @keyframes resizeIndicator {
     0%, 100% { opacity: 0.6; }
     50% { opacity: 1; }
 }
 
-/* ========== 动画类应用 ========== */
-.anim-boot-fade-in {
-    animation: bootFadeIn 1.5s var(--macos-ease-decelerate) forwards;
-}
+/* ===== 动画类应用 ===== */
+.anim-boot-fade-in { animation: bootFadeIn 1.5s var(--macos-ease-decelerate) forwards; }
+.anim-logo-pulse { animation: logoPulse 2s ease-in-out infinite; }
+.anim-menu-bar-slide { animation: menuBarSlideDown 1.0s var(--macos-ease-decelerate) forwards; }
+.anim-submenu-reveal { animation: submenuReveal 0.8s var(--macos-ease-smooth) forwards; }
+.anim-dock-slide-up { animation: dockSlideUp 1.2s var(--macos-ease-smooth) 0.3s backwards; }
+.anim-dock-item-pop { animation: dockItemPop 1.0s var(--macos-ease-smooth) backwards; }
+.anim-dock-bounce { animation: dockBounce 0.6s var(--macos-ease-smooth); }
+.anim-badge-appear { animation: badgeAppear 0.8s var(--macos-ease-smooth) forwards; }
 
-.anim-logo-pulse {
-    animation: logoPulse 2s ease-in-out infinite;
-}
+.anim-window-open { animation: windowOpen 1.2s var(--macos-ease-decelerate) forwards; }
+.anim-window-close { animation: windowClose 1.0s var(--macos-ease-accelerate) forwards; }
+.anim-window-minimize { animation: windowMinimizeGenie 1.2s var(--macos-ease-accelerate) forwards; }
+.anim-window-restore { animation: windowRestoreFromDock 1.2s var(--macos-ease-decelerate) forwards; }
+.anim-window-fullscreen { animation: windowFullscreen 1.0s var(--macos-ease-standard) forwards; }
+.anim-window-exit-fullscreen { animation: windowExitFullscreen 1.0s var(--macos-ease-standard) forwards; }
+.anim-window-focus { animation: windowFocusPulse 1.5s var(--macos-ease-smooth); }
 
-.anim-menu-bar-slide {
-    animation: menuBarSlideDown 1.0s var(--macos-ease-decelerate) forwards;
-}
+.anim-icon-fade-in { animation: iconFadeInStagger 1.0s var(--macos-ease-decelerate) backwards; }
+.anim-icon-select { animation: iconSelect 0.8s var(--macos-ease-smooth); }
+.anim-context-menu { animation: contextMenuAppear 0.8s var(--macos-ease-smooth) forwards; }
+.anim-control-center { animation: controlCenterSlide 1.0s var(--macos-ease-smooth) forwards; }
+.anim-module-stagger { animation: moduleStagger 0.8s var(--macos-ease-decelerate) backwards; }
+.anim-siri-orb { animation: siriOrbPulse 3s ease-in-out infinite; }
+.anim-siri-reveal { animation: siriInterfaceReveal 1.2s var(--macos-ease-smooth) forwards; }
+.anim-drag-lift { animation: dragLift 0.6s var(--macos-ease-smooth) forwards; }
 
-.anim-submenu-reveal {
-    animation: submenuReveal 0.8s var(--macos-ease-spring) forwards;
-}
-
-.anim-dock-slide-up {
-    animation: dockSlideUp 1.2s var(--macos-ease-spring) 0.3s backwards;
-}
-
-.anim-dock-item-pop {
-    animation: dockItemPop 1.0s var(--macos-ease-spring) backwards;
-}
-
-.anim-dock-bounce {
-    animation: dockBounce 1.0s var(--macos-ease-spring);
-}
-
-.anim-badge-appear {
-    animation: badgeAppear 1.0s var(--macos-ease-spring) forwards;
-}
-
-.anim-window-open {
-    animation: windowOpen 1.2s var(--macos-ease-spring) forwards;
-}
-
-.anim-window-close {
-    animation: windowClose 1.0s var(--macos-ease-accelerate) forwards;
-}
-
-.anim-window-minimize {
-    animation: windowMinimizeGenie 1.2s var(--macos-ease-accelerate) forwards;
-}
-
-.anim-window-restore {
-    animation: windowRestoreFromDock 1.2s var(--macos-ease-decelerate) forwards;
-}
-
-.anim-window-fullscreen {
-    animation: windowFullscreen 1.0s var(--macos-ease-spring) forwards;
-}
-
-.anim-window-exit-fullscreen {
-    animation: windowExitFullscreen 1.0s var(--macos-ease-spring) forwards;
-}
-
-.anim-window-focus {
-    animation: windowFocusPulse 1.5s var(--macos-ease-smooth);
-}
-
-.anim-icon-fade-in {
-    animation: iconFadeInStagger 1.0s var(--macos-ease-decelerate) backwards;
-}
-
-.anim-icon-select {
-    animation: iconSelect 1.0s var(--macos-ease-spring);
-}
-
-.anim-context-menu {
-    animation: contextMenuAppear 1.0s var(--macos-ease-spring) forwards;
-}
-
-.anim-control-center {
-    animation: controlCenterSlide 1.2s var(--macos-ease-spring) forwards;
-}
-
-.anim-module-stagger {
-    animation: moduleStagger 1.0s var(--macos-ease-decelerate) backwards;
-}
-
-.anim-siri-orb {
-    animation: siriOrbPulse 3s ease-in-out infinite;
-}
-
-.anim-siri-reveal {
-    animation: siriInterfaceReveal 1.5s var(--macos-ease-spring) forwards;
-}
-
-.anim-drag-lift {
-    animation: dragLift 1.0s var(--macos-ease-spring) forwards;
-}
-
-/* ========== 过渡效果类 ========== */
+/* ===== 过渡类 ===== */
 .transition-stable {
-    transition: all 1.2s var(--macos-ease-spring);
+    transition: all 1.2s var(--macos-ease-smooth);
     will-change: transform, opacity;
 }
-
 .transition-window {
-    transition: transform 1.2s var(--macos-ease-spring),
+    transition: transform 1.2s var(--macos-ease-smooth),
                 opacity 0.8s var(--macos-ease-smooth),
-                width 1.0s var(--macos-ease-spring),
-                height 1.0s var(--macos-ease-spring),
-                left 1.0s var(--macos-ease-spring),
-                top 1.0s var(--macos-ease-spring);
+                width 1.0s var(--macos-ease-standard),
+                height 1.0s var(--macos-ease-standard),
+                left 1.0s var(--macos-ease-standard),
+                top 1.0s var(--macos-ease-standard);
     will-change: transform, opacity, width, height, left, top;
 }
-
 .transition-minimize {
     transition: all 1.2s var(--macos-ease-accelerate);
-    will-change: transform, opacity, clip-path;
+    will-change: transform, opacity;
 }
-
 .transition-dock {
-    transition: transform 0.6s var(--macos-ease-spring),
+    transition: transform 0.6s var(--macos-ease-smooth),
                 opacity 0.4s var(--macos-ease-smooth);
     will-change: transform, opacity;
 }
-
 .transition-menu {
     transition: opacity 0.6s var(--macos-ease-smooth),
-                transform 0.6s var(--macos-ease-spring);
+                transform 0.6s var(--macos-ease-smooth);
     will-change: opacity, transform;
 }
 
-/* ========== 窗口状态类 (防动画缺失) ========== */
-.window-animating {
-    pointer-events: none !important;
-    user-select: none !important;
-}
+/* ===== 状态类 ===== */
+.window-animating { pointer-events: none !important; user-select: none !important; }
+.window-animating iframe { pointer-events: none !important; }
+.window-dragging { cursor: grabbing !important; transition: none !important; will-change: left, top; z-index: 99999 !important; }
+.window-resizing { cursor: inherit !important; transition: none !important; will-change: width, height, left, top; z-index: 99999 !important; }
+.window-minimizing { pointer-events: none; transition: all 1.2s var(--macos-ease-accelerate); transform-origin: center bottom; }
+.window-restoring { pointer-events: none; transition: all 1.2s var(--macos-ease-decelerate); transform-origin: center bottom; }
+.window-stable { transition: box-shadow 0.3s var(--macos-ease-smooth); }
 
-.window-animating iframe {
-    pointer-events: none !important;
-}
+/* ===== GPU 加速 ===== */
+.gpu-accelerated { transform: translateZ(0); backface-visibility: hidden; perspective: 1000px; }
+.contain-layout { contain: layout style paint; }
+.will-change-transform { will-change: transform; }
+.will-change-opacity { will-change: opacity; }
 
-.window-dragging {
-    cursor: grabbing !important;
-    transition: none !important;
-    will-change: left, top;
-    z-index: 99999 !important;
-}
-
-.window-resizing {
-    cursor: inherit !important;
-    transition: none !important;
-    will-change: width, height, left, top;
-    z-index: 99999 !important;
-}
-
-.window-minimizing {
-    pointer-events: none;
-    transition: all 1.2s var(--macos-ease-accelerate);
-    transform-origin: center bottom;
-}
-
-.window-restoring {
-    pointer-events: none;
-    transition: all 1.2s var(--macos-ease-decelerate);
-    transform-origin: center bottom;
-}
-
-/* 防止动画冲突 */
-.window-stable {
-    transition: box-shadow 0.3s var(--macos-ease-smooth);
-}
-
-/* ========== GPU加速与性能优化 ========== */
-.gpu-accelerated {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-}
-
-.contain-layout {
-    contain: layout style paint;
-}
-
-.will-change-transform {
-    will-change: transform;
-}
-
-.will-change-opacity {
-    will-change: opacity;
-}
-
-/* 减少动画偏好支持 */
+/* ===== 减少动画偏好 ===== */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -645,10 +217,6 @@
         transition-duration: 0.01ms !important;
     }
 }
-
-/* 高DPI屏幕优化 */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .window, .dock-panel, .menu-bar {
-        transform: translateZ(0);
-    }
+    .window, .dock-panel, .menu-bar { transform: translateZ(0); }
 }

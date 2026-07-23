@@ -1,4 +1,4 @@
-﻿/* ========== 灵动岛 ========== */
+/* ========== 灵动岛 ========== */
 .dynamic-island {
     position: fixed;
     top: 8px;
@@ -6,9 +6,9 @@
     transform: translateX(-50%);
     width: 120px;
     height: 36px;
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -17,23 +17,23 @@
     cursor: pointer;
     z-index: 10001;
     overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
-    border: 0.5px solid rgba(255,255,255,0.08);
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    transition: all 0.55s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
 }
 
 /* 展开状态 */
 .dynamic-island.expanded-small {
     width: 320px;
     height: 80px;
-    border-radius: 28px;
+    border-radius: 30px;
     padding: 14px 20px;
 }
 .dynamic-island.expanded-large {
     width: 380px;
     height: 180px;
-    border-radius: 40px;
+    border-radius: 42px;
     padding: 20px 24px;
 }
 
@@ -49,10 +49,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     color: #fff;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
+    letter-spacing: 0.2px;
     white-space: nowrap;
     width: 100%;
     height: 100%;
@@ -167,29 +168,23 @@
     background: rgba(255,255,255,0.1);
 }
 
-/* 空闲状态 */
+/* ========== 空闲状态 - 引用外部图片作为背景 ========== */
 .island-idle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    position: relative;
     width: 100%;
     height: 100%;
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
-}
-.island-idle-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: #34c759;
-    animation: idleDotPulse 3s ease-in-out infinite;
-}
-@keyframes idleDotPulse {
-    0%,100% { opacity:0.6; transform:scale(1); }
-    50% { opacity:1; transform:scale(1.3); }
+    border-radius: inherit;   /* 继承父容器圆角，完美贴合 */
+    overflow: hidden;
+    /* 设置背景图片：相对路径 ./webp/ldd.webp */
+    background-image: url('./webp/ldd.webp');
+    background-size: cover;      /* 覆盖整个区域，可能裁剪，也可用 contain 按需 */
+    background-position: center;
+    background-repeat: no-repeat;
+    /* 如果有半透明叠加需求，可增加伪类，这里保持干净 */
 }
 
-/* 深色模式支持 */
+/* 可选：如果图片比较亮，可以加一点深色叠加层增强文字可读性（但空闲状态无文字，可不加） */
+/* 深色模式支持（不影响背景图） */
 body.dark-mode .dynamic-island {
     background: rgba(28,28,30,0.92);
 }

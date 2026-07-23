@@ -35,111 +35,22 @@
     <base target="_blank">
 </head>
 <body>
-    <!-- 开机动画层 -->
+    <!-- 开机动画层（已改为苹果 Logo + 进度条） -->
     <div id="boot-screen" class="boot-screen">
-        <div class="loader rainbow">
-            <div class="circle" style="--i: 1"></div>
-            <div class="circle" style="--i: 2"></div>
-            <div class="circle" style="--i: 3"></div>
-            <div class="circle" style="--i: 4"></div>
-            <div class="circle" style="--i: 5"></div>
-            <div class="circle" style="--i: 6"></div>
-            <div class="circle" style="--i: 7"></div>
-            <div class="circle" style="--i: 8"></div>
-            <div class="circle" style="--i: 9"></div>
-            <div class="circle" style="--i: 10"></div>
-            <div class="circle" style="--i: 11"></div>
-            <div class="circle" style="--i: 12"></div>
-            <div class="circle" style="--i: 13"></div>
-            <div class="circle" style="--i: 14"></div>
-            <div class="circle" style="--i: 15"></div>
-            <div class="circle" style="--i: 16"></div>
-            <div class="circle" style="--i: 17"></div>
-            <div class="circle" style="--i: 18"></div>
-            <div class="circle" style="--i: 19"></div>
-            <div class="circle" style="--i: 20"></div>
-            <div class="circle" style="--i: 21"></div>
-            <div class="circle" style="--i: 22"></div>
-            <div class="circle" style="--i: 23"></div>
-            <div class="circle" style="--i: 24"></div>
-            <div class="circle" style="--i: 25"></div>
-            <div class="circle" style="--i: 26"></div>
-            <div class="circle" style="--i: 27"></div>
-            <div class="circle" style="--i: 28"></div>
-            <div class="circle" style="--i: 29"></div>
-            <div class="circle" style="--i: 30"></div>
-            <div class="circle" style="--i: 31"></div>
-            <div class="circle" style="--i: 32"></div>
-            <div class="circle" style="--i: 33"></div>
-            <div class="circle" style="--i: 34"></div>
-            <div class="circle" style="--i: 35"></div>
-            <div class="circle" style="--i: 36"></div>
-            <div class="circle" style="--i: 37"></div>
-            <div class="circle" style="--i: 38"></div>
-            <div class="circle" style="--i: 39"></div>
-            <div class="circle" style="--i: 40"></div>
-            <div class="circle" style="--i: 41"></div>
-            <div class="circle" style="--i: 42"></div>
-            <div class="circle" style="--i: 43"></div>
-            <div class="circle" style="--i: 44"></div>
-            <div class="circle" style="--i: 45"></div>
-            <div class="circle" style="--i: 46"></div>
-            <div class="circle" style="--i: 47"></div>
-            <div class="circle" style="--i: 48"></div>
-            <div class="circle" style="--i: 49"></div>
-            <div class="circle" style="--i: 50"></div>
-            <div class="circle" style="--i: 51"></div>
-            <div class="circle" style="--i: 52"></div>
-            <div class="circle" style="--i: 53"></div>
-            <div class="circle" style="--i: 54"></div>
-            <div class="circle" style="--i: 55"></div>
-            <div class="circle" style="--i: 56"></div>
-            <div class="circle" style="--i: 57"></div>
-            <div class="circle" style="--i: 58"></div>
-            <div class="circle" style="--i: 59"></div>
-            <div class="circle" style="--i: 60"></div>
-            <div class="circle" style="--i: 61"></div>
-            <div class="circle" style="--i: 62"></div>
-            <div class="circle" style="--i: 63"></div>
-            <div class="circle" style="--i: 64"></div>
-            <div class="circle" style="--i: 65"></div>
-            <div class="circle" style="--i: 66"></div>
-            <div class="circle" style="--i: 67"></div>
-            <div class="circle" style="--i: 68"></div>
-            <div class="circle" style="--i: 69"></div>
-            <div class="circle" style="--i: 70"></div>
-            <div class="circle" style="--i: 71"></div>
-            <div class="circle" style="--i: 72"></div>
-            <div class="circle" style="--i: 73"></div>
-            <div class="circle" style="--i: 74"></div>
-            <div class="circle" style="--i: 75"></div>
-            <div class="circle" style="--i: 76"></div>
-            <div class="circle" style="--i: 77"></div>
-            <div class="circle" style="--i: 78"></div>
-            <div class="circle" style="--i: 79"></div>
-            <div class="circle" style="--i: 80"></div>
-            <div class="circle" style="--i: 81"></div>
-            <div class="circle" style="--i: 82"></div>
-            <div class="circle" style="--i: 83"></div>
-            <div class="circle" style="--i: 84"></div>
-            <div class="circle" style="--i: 85"></div>
-            <div class="circle" style="--i: 86"></div>
-            <div class="circle" style="--i: 87"></div>
-            <div class="circle" style="--i: 88"></div>
-            <div class="circle" style="--i: 89"></div>
-            <div class="circle" style="--i: 90"></div>
-            <div class="circle" style="--i: 91"></div>
-            <div class="circle" style="--i: 92"></div>
-            <div class="circle" style="--i: 93"></div>
-            <div class="circle" style="--i: 94"></div>
-            <div class="circle" style="--i: 95"></div>
-            <div class="circle" style="--i: 96"></div>
-            <div class="circle" style="--i: 97"></div>
-            <div class="circle" style="--i: 98"></div>
-            <div class="circle" style="--i: 99"></div>
-            <div class="circle" style="--i: 100"></div>
+        <div class="boot-content">
+            <!-- 苹果 Logo（使用 Font Awesome 图标） -->
+            <div class="boot-logo">
+                <i class="fab fa-apple"></i>
+            </div>
+            <!-- 进度条 -->
+            <div class="boot-progress-container">
+                <div class="boot-progress-bar"></div>
+            </div>
+            <!-- 提示文字 -->
+            <div class="boot-hint">正在启动 macOS...</div>
         </div>
     </div>
+
     <div id="siri-panel" class="siri-panel">
         <div id="poda">
             <div class="glow"></div>
@@ -229,6 +140,13 @@
                 </div>
                 <span>小宁AI</span>
             </div>
+            <div class="desktop-icon" draggable="true" data-type="app" data-name="App Store" data-app="appstore">
+                <div class="icon-container">
+                    <img src="./webp/appstore.webp" alt="App Store" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <i class="fas fa-info-circle" style="display: none; font-size: 50px; color: #007aff;"></i>
+                </div>
+                <span>App Store</span>
+            </div>
             <div class="desktop-icon" draggable="true" data-type="app" data-name="测试" data-app="text">
                 <div class="icon-container">
                     <img src="./webp/text.webp" alt="测试" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
@@ -236,19 +154,6 @@
                 </div>
                 <span>测试</span>
             </div>
-        </div>
-        <div class="context-menu" id="desktop-context-menu" style="display: none;">
-            <ul>
-                <li><a href="#" id="new-folder"><i class="fas fa-folder"></i> 新建文件夹</a></li>
-                <li><a href="#" id="new-document"><i class="fas fa-file-alt"></i> 新建文档</a></li>
-                <li class="separator"></li>
-                <li><a href="#" id="paste"><i class="fas fa-paste"></i> 粘贴</a></li>
-                <li class="separator"></li>
-                <li><a href="#" id="sort-by"><i class="fas fa-sort"></i> 排序方式</a></li>
-                <li><a href="#" id="show-view-options"><i class="fas fa-th"></i> 查看显示选项</a></li>
-                <li class="separator"></li>
-                <li><a href="#" id="get-info"><i class="fas fa-info-circle"></i> 显示简介</a></li>
-            </ul>
         </div>
     </div>
 
@@ -267,15 +172,10 @@
             <div class="menu-item" id="control-center-trigger" title="控制中心">
                 <span class="menu-title"><i class="fas fa-sliders-h"></i></span>
             </div>
+            <!-- Siri 按钮 -->
             <div class="menu-item siri-btn" id="siri-trigger" title="Ask Siri">
-                <div class="outer-cont flex" style="padding: 0 8px; height: 26px; gap: 4px;">
-                    <svg viewBox="0 0 24 24" height="16" width="16" xmlns="http://www.w3.org/2000/svg">
-                        <g fill="none">
-                            <path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"></path>
-                            <path d="M9.107 5.448c.598-1.75 3.016-1.803 3.725-.159l.06.16l.807 2.36a4 4 0 0 0 2.276 2.411l.217.081l2.36.806c1.75.598 1.803 3.016.16 3.725l-.16.06l-2.36.807a4 4 0 0 0-2.412 2.276l-.081.216l-.806 2.361c-.598 1.75-3.016 1.803-3.724.16l-.062-.16l-.806-2.36a4 4 0 0 0-2.276-2.412l-.216-.081l-2.36-.806c-1.751-.598-1.804-3.016-.16-3.724l.16-.062l2.36-.806A4 4 0 0 0 8.22 8.025l.081-.216zM11 6.094l-.806 2.36a6 6 0 0 1-3.49 3.649l-.25.091l-2.36.806l2.36.806a6 6 0 0 1 3.649 3.49l.091.25l.806 2.36l.806-2.36a6 6 0 0 1 3.49-3.649l.25-.09l2.36-.807l-2.36-.806a6 6 0 0 1-3.649-3.49l-.09-.25zM19 2a1 1 0 0 1 .898.56l.048.117l.35 1.026l1.027.35a1 1 0 0 1 .118 1.845l-.118.048l-1.026.35l-.35 1.027a1 1 0 0 1-1.845.117l-.048-.117l-.35-1.026l-1.027-.35a1 1 0 0 1-.118-1.845l.118-.048l1.026-.35l.35-1.027A1 1 0 0 1 19 2" fill="currentColor"></path>
-                        </g>
-                    </svg>
-                    <span style="font-size: 12px; font-weight: 500;">Siri</span>
+                <div style="display: flex; align-items: center; padding: 0 8px; height: 26px;">
+                    <img src="./webp/siri.webp" alt="Siri" style="height: 18px; width: auto; display: block;">
                 </div>
             </div>
             <div class="menu-item"><span class="menu-title"><i class="fas fa-search"></i></span></div>
@@ -322,7 +222,7 @@
                     <img src="./webp/settings.webp" alt="设置" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <i class="fas fa-cog" style="display: none; font-size: 28px; color: #8e8e93;"></i>
                 </div>
-                <div class="dock-label">系统偏好设置</div>
+                <div class="dock-label">设置</div>
                 <div class="dock-indicator"></div>
             </div>
 
@@ -348,7 +248,12 @@
     </div>
 
     <!-- JavaScript 文件 -->
-    <script src="./script.js"></script>
+	<script src="modules/utils.js"></script>
+	<script src="./modules/drag-resize.js"></script>
+	<script src="./modules/window-core.js"></script>
+	<script src="./modules/app-store.js"></script>
+	<script src="./modules/message.js"></script>
+	<script src="script.js"></script>
     <script src="./siri.js"></script>
     <script src="./c.js"></script>
     <script src="./d.js"></script>

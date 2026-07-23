@@ -20,20 +20,8 @@ class DynamicIsland {
         this.content = this.container.querySelector('.island-content');
         this.container.addEventListener('click', (e) => this.handleClick(e));
         document.addEventListener('click', (e) => this.handleOutsideClick(e));
-        this.startClock();
         this.setMode('idle');
         this.listenAppMessages();
-    }
-    startClock() {
-        this.updateClock();
-        setInterval(() => this.updateClock(), 1000);
-    }
-    updateClock() {
-        const clockSpan = document.getElementById('island-clock');
-        if (clockSpan) {
-            const now = new Date();
-            clockSpan.textContent = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-        }
     }
     setMode(mode, data = {}) {
         this.currentMode = mode;
@@ -54,8 +42,8 @@ class DynamicIsland {
         const mode = this.currentMode;
         const d = this._currentData;
         if (mode === 'idle') {
-            this.content.innerHTML = `<div class="island-idle"><div class="island-idle-dot"></div><span id="island-clock"></span></div>`;
-            this.updateClock();
+            // 空闲状态：只留背景光效，无脉冲点，无文字
+            this.content.innerHTML = `<div class="island-idle"></div>`;
             return;
         }
         let compactHtml = '';

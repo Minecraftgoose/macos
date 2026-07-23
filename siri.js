@@ -489,7 +489,7 @@ openApp, closeWindow, minimizeWindow, restoreWindow, setDarkMode, setBrightness,
         if (!text.trim() || isProcessing) return;
         const trimmed = text.trim();
         
-        if (trimmed === '开启agent，邀请码Goose！') {
+        if (trimmed === 'agent') {
             if (!agentModeEnabled) {
                 agentModeEnabled = true;
                 addMessage(text, true);

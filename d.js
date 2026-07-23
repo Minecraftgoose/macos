@@ -1,27 +1,27 @@
-// ========== d.js ==========
+// ========== d.js - 平滑直驱版（无弹跳） ==========
 const AnimationManager = {
     // 动画配置
     config: {
-        // 缓动函数 - macOS官方曲线
+        // 缓动函数 - 全部改为平滑/减速，去掉 spring
         easing: {
             standard: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
             decelerate: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
             accelerate: 'cubic-bezier(0.4, 0.0, 1.0, 1.0)',
-            spring: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            // spring 替换为 smooth
+            spring: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',   // 平滑，无弹跳
             smooth: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)'
         },
-        // 持续时间配置 
+        // 持续时间（保持原样，可微调）
         duration: {
             instant: 100,
             fast: 300,
             normal: 600,
-            slow: 1000,      // 最小1秒
-            slower: 1200,    // 标准窗口动画
-            slowest: 1500, // 强调动画
+            slow: 1000,
+            slower: 1200,
+            slowest: 1500,
             boot: 1500,
-            genie: 1200      // Genie效果
+            genie: 1200
         },
-        // 性能优化
         gpu: {
             transform: 'translateZ(0)',
             backface: 'hidden',
@@ -29,7 +29,6 @@ const AnimationManager = {
         }
     },
 
-    // 动画状态跟踪
     state: {
         activeAnimations: new Map(),
         isAnimating: false,
@@ -37,17 +36,14 @@ const AnimationManager = {
         lastAnimationTime: 0
     },
 
-    /* 初始化动画系统*/
     init() {
         this.createOverlay();
         this.setupGlobalListeners();
-        console.log('macOS动画系统v2.0');
+        console.log('macOS动画系统v3.0 · 平滑直驱');
     },
 
-    /* 创建拖拽/调整大小遮罩层*/
     createOverlay() {
         if (document.getElementById('animation-overlay')) return;
-
         const overlay = document.createElement('div');
         overlay.id = 'animation-overlay';
         overlay.style.cssText = `
@@ -96,12 +92,9 @@ const AnimationManager = {
 
     async waitForAnimation(element, timeout = null) {
         if (!element) return;
-
         const duration = timeout || this.config.duration.slower;
-
         return new Promise((resolve) => {
             let resolved = false;
-
             const cleanup = () => {
                 if (resolved) return;
                 resolved = true;
@@ -111,15 +104,11 @@ const AnimationManager = {
                 clearTimeout(safetyTimeout);
                 resolve();
             };
-
             const onEnd = (e) => {
                 if (e.target === element) cleanup();
             };
-
             const onCancel = () => cleanup();
-
             const safetyTimeout = setTimeout(cleanup, duration + 200);
-
             element.addEventListener('transitionend', onEnd);
             element.addEventListener('animationend', onEnd);
             element.addEventListener('animationcancel', onCancel);
@@ -128,19 +117,14 @@ const AnimationManager = {
 
     async applyAnimation(element, animationClass, duration = null) {
         if (!element) return;
-
         const animId = `${element.id || 'unknown'}-${animationClass}-${Date.now()}`;
-
         if (this.state.activeAnimations.has(element)) {
             await this.cancelAnimation(element);
         }
-
         this.state.activeAnimations.set(element, animId);
-
         return new Promise(async (resolve) => {
             let resolved = false;
             const timeoutDuration = duration || this.config.duration.slower;
-
             const cleanup = () => {
                 if (resolved) return;
                 resolved = true;
@@ -148,24 +132,18 @@ const AnimationManager = {
                 element.removeEventListener('animationend', onEnd);
                 element.removeEventListener('animationcancel', onCancel);
                 clearTimeout(safetyTimeout);
-
                 if (this.state.activeAnimations.get(element) === animId) {
                     this.state.activeAnimations.delete(element);
                 }
                 resolve();
             };
-
             const onEnd = (e) => {
                 if (e.target === element) cleanup();
             };
-
             const onCancel = () => cleanup();
-
             element.addEventListener('animationend', onEnd, { once: false });
             element.addEventListener('animationcancel', onCancel, { once: true });
-
             const safetyTimeout = setTimeout(cleanup, timeoutDuration + 300);
-
             element.offsetHeight;
             element.classList.add(animationClass);
         });
@@ -173,33 +151,26 @@ const AnimationManager = {
 
     async cancelAnimation(element) {
         if (!element) return;
-
         const activeAnim = this.state.activeAnimations.get(element);
         if (activeAnim) {
             const classes = Array.from(element.classList);
             const animClasses = classes.filter(c => c.startsWith('anim-'));
             animClasses.forEach(c => element.classList.remove(c));
-
             this.state.activeAnimations.delete(element);
-
             await this.nextFrame();
         }
     },
 
-
     setTransition(element, properties = 'all', duration = null, easing = null) {
         if (!element) return;
-
         const dur = (duration || this.config.duration.slower) + 'ms';
-        const ease = easing || this.config.easing.spring;
-
+        const ease = easing || this.config.easing.smooth;  // 默认平滑
         if (Array.isArray(properties)) {
             const transitions = properties.map(prop => `${prop} ${dur} ${ease}`);
             element.style.transition = transitions.join(', ');
         } else {
             element.style.transition = `${properties} ${dur} ${ease}`;
         }
-
         element.style.willChange = Array.isArray(properties) 
             ? properties.join(', ') 
             : properties;
@@ -211,6 +182,7 @@ const AnimationManager = {
         element.style.willChange = '';
     },
 
+    // ========== 窗口打开（平滑，无弹跳） ==========
     async animateWindowOpen(windowElement) {
         if (!windowElement) return;
         const winId = windowElement.id || 'window-' + Date.now();
@@ -220,7 +192,7 @@ const AnimationManager = {
         const appName = windowElement.dataset.app;
         const dockItem = appName ? document.querySelector(`.dock-item[data-app="${appName}"]`) : null;
         const dur = this.config.duration.slower;
-        const ease = this.config.easing.spring;
+        const ease = this.config.easing.decelerate;   // 减速进入，无弹跳
 
         const origTransition = windowElement.style.transition;
         const origWillChange = windowElement.style.willChange;
@@ -240,17 +212,14 @@ const AnimationManager = {
             const offX = dockCX - winCX;
             const offY = dockCY - winCY;
 
-            // 初始状态
             windowElement.style.transition = 'none';
             windowElement.style.transform = `translate(${offX}px, ${offY}px) scale(0.05)`;
             windowElement.style.opacity = '0';
             void windowElement.offsetHeight;
 
-            // 启用 transition
             windowElement.style.transition = `transform ${dur}ms ${ease}, opacity ${dur}ms ${ease}`;
             windowElement.style.willChange = 'transform, opacity';
 
-            // 下一帧触发最终状态
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     windowElement.style.transform = 'translate(0, 0) scale(1)';
@@ -288,9 +257,9 @@ const AnimationManager = {
         this.notifyWindowResize(windowElement);
     },
 
+    // ========== 窗口关闭（平滑加速，无弹跳） ==========
     async animateWindowClose(windowElement) {
         if (!windowElement) return;
-
         const winId = windowElement.id || 'unknown';
         this.state.windowStates.set(winId, 'closing');
 
@@ -301,15 +270,12 @@ const AnimationManager = {
 
         this.showOverlay();
 
-        // 初始状态
         windowElement.style.transition = 'none';
         void windowElement.offsetHeight;
 
-        // 启用 transition（加速退出）
         windowElement.style.transition = `transform ${dur}ms ${ease}, opacity ${dur}ms ${ease}, filter ${dur}ms ${ease}`;
         windowElement.style.willChange = 'transform, opacity, filter';
 
-        // 下一帧触发最终状态
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 windowElement.style.transform = 'scale(0.85)';
@@ -320,7 +286,6 @@ const AnimationManager = {
 
         await new Promise(r => setTimeout(r, dur + 50));
 
-        // 清理
         windowElement.style.transition = 'none';
         windowElement.style.transform = '';
         windowElement.style.opacity = '';
@@ -333,6 +298,7 @@ const AnimationManager = {
         this.state.windowStates.delete(winId);
     },
 
+    // ========== 最小化（平滑缩放+位移，无弹跳） ==========
     async animateWindowMinimize(windowElement, dockRect, windowRect) {
         if (!windowElement) return;
         const winId = windowElement.id || 'unknown';
@@ -346,7 +312,7 @@ const AnimationManager = {
         if (!wr) wr = windowElement.getBoundingClientRect();
 
         const dur = this.config.duration.genie;
-        const ease = this.config.easing.accelerate;
+        const ease = this.config.easing.accelerate;   // 加速缩小
         const origTransition = windowElement.style.transition;
         const origWillChange = windowElement.style.willChange;
 
@@ -401,6 +367,7 @@ const AnimationManager = {
         this.state.windowStates.set(winId, 'minimized');
     },
 
+    // ========== 恢复（平滑放大+位移，无弹跳） ==========
     async animateWindowRestore(windowElement, dockRect, originalRect) {
         if (!windowElement || !originalRect) return;
         const winId = windowElement.id || 'unknown';
@@ -412,11 +379,10 @@ const AnimationManager = {
         if (!dr && dockItem) dr = dockItem.getBoundingClientRect();
 
         const dur = this.config.duration.genie;
-        const ease = this.config.easing.decelerate;
+        const ease = this.config.easing.decelerate;   // 减速恢复
         const origTransition = windowElement.style.transition;
         const origWillChange = windowElement.style.willChange;
 
-        // 设置目标位置
         windowElement.style.left = originalRect.left + 'px';
         windowElement.style.top = originalRect.top + 'px';
         windowElement.style.width = originalRect.width + 'px';
@@ -477,14 +443,14 @@ const AnimationManager = {
         this.notifyWindowResize(windowElement);
     },
 
+    // ========== 全屏切换（平滑，无弹跳） ==========
     async animateWindowFullscreen(windowElement, isFullscreen, targetRect) {
         if (!windowElement || !targetRect) return;
-
         const winId = windowElement.id || 'unknown';
         this.state.windowStates.set(winId, isFullscreen ? 'fullscreening' : 'exiting-fullscreen');
 
         const dur = this.config.duration.slow;
-        const ease = this.config.easing.spring;
+        const ease = this.config.easing.standard;   // 标准缓动，无弹跳
         const origTransition = windowElement.style.transition;
         const origWillChange = windowElement.style.willChange;
 
@@ -502,7 +468,6 @@ const AnimationManager = {
 
         await new Promise(r => setTimeout(r, dur + 50));
 
-        // 清理
         windowElement.style.transition = 'none';
         windowElement.style.willChange = origWillChange;
         void windowElement.offsetHeight;
@@ -513,56 +478,49 @@ const AnimationManager = {
         this.notifyWindowResize(windowElement);
     },
 
+    // ========== 窗口聚焦（平滑阴影过渡，无弹跳） ==========
     async animateWindowFocus(windowElement) {
         if (!windowElement) return;
-
         windowElement.classList.remove('anim-window-focus');
         await this.nextFrame();
-
         await this.applyAnimation(windowElement, 'anim-window-focus', this.config.duration.slowest);
     },
 
+    // ========== Dock 弹跳（改为平滑缩放，无弹跳） ==========
     async animateDockBounce(dockItem) {
         if (!dockItem) return;
-        await this.applyAnimation(dockItem, 'anim-dock-bounce', 600);
+        // 改为平滑放大再缩回（无弹跳）
+        dockItem.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1.0)';
+        dockItem.style.transform = 'scale(1.15)';
+        await new Promise(r => setTimeout(r, 300));
+        dockItem.style.transform = 'scale(1)';
+        await new Promise(r => setTimeout(r, 400));
+        dockItem.style.transition = '';
     },
 
     async animateDockItemAppear(dockItem, delay = 0) {
         if (!dockItem) return;
-
         dockItem.style.opacity = '0';
         await this.nextFrame();
-
         setTimeout(async () => {
             await this.applyAnimation(dockItem, 'anim-dock-item-pop', this.config.duration.slow);
         }, delay);
     },
 
-    /**
-     * 桌面图标交错出现
-     */
     async animateDesktopIconsStagger() {
         const icons = document.querySelectorAll('.desktop-icon');
-
         icons.forEach((icon, index) => {
             setTimeout(async () => {
                 await this.applyAnimation(icon, 'anim-icon-fade-in', this.config.duration.slow);
-            }, index * 100); // 每个图标延迟100ms
+            }, index * 100);
         });
     },
 
-    /**
-     * 控制中心显示动画
-     */
     async animateControlCenterShow(controlCenter) {
         if (!controlCenter) return;
-
         controlCenter.style.opacity = '0';
         await this.nextFrame();
-
         await this.applyAnimation(controlCenter, 'anim-control-center', this.config.duration.slower);
-
-        // 模块交错动画
         const modules = controlCenter.querySelectorAll('.cc-module');
         modules.forEach((mod, index) => {
             setTimeout(() => {
@@ -571,31 +529,19 @@ const AnimationManager = {
         });
     },
 
-    /**
-     * 右键菜单显示
-     */
     async animateContextMenu(menu) {
         if (!menu) return;
-
         menu.style.opacity = '0';
         await this.nextFrame();
-
         await this.applyAnimation(menu, 'anim-context-menu', this.config.duration.slow);
     },
 
-    /**
-     * 拖拽开始视觉反馈
-     */
     async animateDragStart(windowElement) {
         if (!windowElement) return;
-
         windowElement.classList.add('window-dragging');
         await this.applyAnimation(windowElement, 'anim-drag-lift', 300);
     },
 
-    /**
-     * 拖拽结束
-     */
     animateDragEnd(windowElement) {
         if (!windowElement) return;
         windowElement.classList.remove('window-dragging');
@@ -603,49 +549,33 @@ const AnimationManager = {
         windowElement.style.boxShadow = '';
     },
 
-    /**
-     * 调整大小开始
-     */
     animateResizeStart(windowElement) {
         if (!windowElement) return;
         windowElement.classList.add('window-resizing');
     },
 
-    /**
-     * 调整大小结束
-     */
     animateResizeEnd(windowElement) {
         if (!windowElement) return;
         windowElement.classList.remove('window-resizing');
         this.notifyWindowResize(windowElement);
     },
 
-    /**
-     * 启动开机动画序列
-     */
     async startBootSequence(bootScreen, progressBar, onComplete) {
         if (!bootScreen) return;
-
-        // Logo脉冲动画
         const logo = bootScreen.querySelector('.boot-logo');
         if (logo) {
             logo.classList.add('anim-logo-pulse');
         }
-
-        // 进度条动画
         let progress = 0;
-        const updateInterval = 50; // 每50ms更新
+        const updateInterval = 50;
         const totalTime = this.config.duration.boot;
         const increment = 100 / (totalTime / updateInterval);
-
         const progressInterval = setInterval(() => {
-            progress += increment + (Math.random() * 2 - 1); // 添加随机性
+            progress += increment + (Math.random() * 2 - 1);
             progress = Math.min(progress, 100);
-
             if (progressBar) {
                 progressBar.style.width = progress + '%';
             }
-
             if (progress >= 100) {
                 clearInterval(progressInterval);
                 setTimeout(() => {
@@ -657,8 +587,6 @@ const AnimationManager = {
                 }, 300);
             }
         }, updateInterval);
-
-        // 安全超时
         setTimeout(() => {
             clearInterval(progressInterval);
             if (progressBar) progressBar.style.width = '100%';
@@ -670,9 +598,6 @@ const AnimationManager = {
         }, totalTime + 1000);
     },
 
-    /**
-     * 通知窗口内容调整大小
-     */
     notifyWindowResize(windowElement) {
         const iframe = windowElement.querySelector('iframe');
         if (iframe && iframe.contentWindow) {
@@ -687,16 +612,11 @@ const AnimationManager = {
         }
     },
 
-    /**
-     * 设置全局事件监听
-     */
     setupGlobalListeners() {
-        // 监听减少动画偏好
         const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         if (mediaQuery.matches) {
             document.body.classList.add('reduce-motion');
         }
-
         mediaQuery.addEventListener('change', (e) => {
             if (e.matches) {
                 document.body.classList.add('reduce-motion');
@@ -706,17 +626,11 @@ const AnimationManager = {
         });
     },
 
-    /**
-     * 获取窗口当前状态
-     */
     getWindowState(windowElement) {
         if (!windowElement) return null;
         return this.state.windowStates.get(windowElement.id) || 'unknown';
     },
 
-    /**
-     * 检查是否正在动画中
-     */
     isAnimating(windowElement) {
         if (windowElement) {
             return this.state.activeAnimations.has(windowElement);
@@ -732,8 +646,5 @@ if (document.readyState === 'loading') {
     AnimationManager.init();
 }
 
-// 导出
 window.AnimationManager = AnimationManager;
-
-// 兼容性导出
 window.macOSAnimation = AnimationManager;

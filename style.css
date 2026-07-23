@@ -7,31 +7,19 @@
 
 /* ========== CSS变量定义 ========== */
 :root {
-    --bg-primary:
-    rgba(242, 242, 247, 0.8);
-    --bg-secondary:
-    rgba(255, 255, 255, 0.6);
-    --bg-tertiary:
-    rgba(242, 242, 247, 0.3);
-    --border-color:
-    rgba(255, 255, 255, 0.2);
-    --text-primary:
-    rgba(0, 0, 0, 0.8);
-    --text-secondary:
-    rgba(0, 0, 0, 0.6);
+    --bg-primary: rgba(242, 242, 247, 0.8);
+    --bg-secondary: rgba(255, 255, 255, 0.6);
+    --bg-tertiary: rgba(242, 242, 247, 0.3);
+    --border-color: rgba(255, 255, 255, 0.2);
+    --text-primary: rgba(0, 0, 0, 0.8);
+    --text-secondary: rgba(0, 0, 0, 0.6);
     --accent-color: #8500ff;
-    --shadow-light:
-    rgba(0, 0, 0, 0.1);
-    --shadow-medium:
-    rgba(0, 0, 0, 0.15);
-    --shadow-heavy:
-    rgba(0, 0, 0, 0.2);
-    --hover-bg:
-    rgba(0, 122, 255, 0.05);
-    --active-bg:
-    rgba(0, 122, 255, 0.15);
-    --easing-bounce:
-    cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+    --shadow-heavy: rgba(0, 0, 0, 0.2);
+    --hover-bg: rgba(0, 122, 255, 0.05);
+    --active-bg: rgba(0, 122, 255, 0.15);
+    --easing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     --transition-normal: 0.3s;
 }
 
@@ -45,36 +33,24 @@ body {
     transition: all var(--transition-normal);
 }
 
-/* ========== 桌面样式 ========== */
+/* ========== 桌面样式（背景色保持深色，壁纸由 JS 动态设置） ========== */
 .desktop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('./webp/wallpaper.webp');
+    background-color: #1e1e2e;
     background-size: cover;
     background-position: center;
-    background-color: #1e1e2e;
     z-index: 0;
     padding-top: 28px;
     padding-bottom: 78px;
     transition: filter 0.3s ease;
 }
 
-/* 深色模式壁纸 */
 body.dark-mode .desktop {
-    background-image: url('./webp/wallpaper-dark.webp');
     background-color: #1a1a2e;
-}
-
-/* 如果本地壁纸加载失败，使用备用在线壁纸 */
-.desktop {
-    background-image: url('./webp/wallpaper.webp'), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format');
-}
-
-body.dark-mode .desktop {
-    background-image: url('./webp/wallpaper-dark.webp'), url('https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2070&auto=format');
 }
 
 /* ========== 深色模式通用样式 ========== */
@@ -143,7 +119,6 @@ body.dark-mode .breadcrumb {
 .desktop-icon:nth-child(4) { animation-delay: 0.2s; }
 .desktop-icon:nth-child(5) { animation-delay: 0.25s; }
 
-/* 修改：移除悬停时的缩放和上移效果 */
 .desktop-icon:hover {
     /* 无任何悬浮位移/缩放效果 */
 }
@@ -341,6 +316,7 @@ body.dark-mode .submenu {
 body.dark-mode .submenu li a {
     color: rgba(255, 255, 255, 0.85);
 }
+
 /* ========== 窗口样式 ========== */
 .window {
     position: absolute;
@@ -389,6 +365,7 @@ body.dark-mode .submenu li a {
     margin-right: 16px;
 }
 
+/* ===== 红绿灯基础样式 ===== */
 .window-close,
 .window-minimize,
 .window-maximize {
@@ -398,7 +375,23 @@ body.dark-mode .submenu li a {
     border: none;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
+    position: relative;  /* 为伪元素提供定位基准 */
+}
+
+/* ===== 扩大点击区域（视觉不变） ===== */
+.window-close::before,
+.window-minimize::before,
+.window-maximize::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: auto;
+    background: transparent;
 }
 
 .window-close {

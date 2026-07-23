@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: rgba(0,0,0,0.05); font-family: -apple-system, BlinkMacSystemFont; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 28px; margin-bottom: 20px; }
+        .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+        .app-card { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .app-card:hover { transform: translateY(-2px); }
+        .app-icon { width: 48px; height: 48px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+        .app-icon img { width: 48px; height: 48px; object-fit: contain; }
+        .app-name { font-weight: bold; font-size: 18px; margin-bottom: 6px; }
+        .app-desc { font-size: 13px; color: #666; margin-bottom: 16px; }
+        button { border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 14px; margin-right: 8px; }
+        .install-btn { background: #007aff; color: white; }
+        .open-btn { background: #34c759; color: white; }
+        .uninstall-btn { background: #ff3b30; color: white; }
+        .custom-section { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 16px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .custom-section h3 { margin-bottom: 12px; }
+        .custom-section input, .custom-section textarea, .custom-section select {
+            width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid rgba(0,0,0,0.2); border-radius: 8px; font-size: 14px; box-sizing: border-box;
+        }
+        .custom-section textarea { height: 80px; resize: vertical; }
+        .custom-section button { width: 100%; padding: 10px; background: #007aff; color: white; border: none; border-radius: 20px; font-size: 16px; cursor: pointer; }
+        #customStatus { margin-top: 12px; font-size: 14px; color: #333; }
+        .section-title { font-size: 20px; margin: 24px 0 12px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 8px; }
+        .loading { color: #666; padding: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1><i class="fab fa-apple"></i> App Store</h1>
+
+    <!-- 自定义软件创建 -->
+    <div class="custom-section">
+        <h3><i class="fas fa-magic"></i> 创建自定义软件</h3>
+        <select id="customType">
+            <option value="url">网址模式</option>
+            <option value="html">HTML 模式</option>
+        </select>
+        <input type="text" id="customName" placeholder="应用名称（必填）">
+        <div id="urlFields">
+            <input type="text" id="customUrl" placeholder="输入网页 URL，例如 https://example.com">
+            <div style="font-size:12px; color:#666;">图标将自动获取该网站的 favicon</div>
+        </div>
+        <div id="htmlFields" style="display:none;">
+            <textarea id="customHtml" placeholder="粘贴完整 HTML 代码"></textarea>
+            <input type="text" id="customIconUrl" placeholder="图标 URL（可选）">
+        </div>
+        <button id="addToStoreBtn"><i class="fas fa-plus"></i> 添加到 App Store</button>
+        <div id="customStatus"></div>
+    </div>
+
+    <!-- 我的自定义应用 -->
+    <div class="section-title"><i class="fas fa-star"></i> 我的自定义应用</div>
+    <div id="custom-apps-list" class="apps-grid"><div class="loading">加载中...</div></div>
+
+    <!-- 推荐应用 -->
+    <div class="section-title"><i class="fas fa-store"></i> 推荐应用</div>
+    <div id="app-list" class="apps-grid"><div class="loading">加载中...</div></div>
+</div>
+
+<script>
+    // ========== 完全使用 postMessage，避免跨域 ==========
+    function sendToParent(action, payload) {
+        window.parent.postMessage({ type: 'appStore', action, payload }, '*');
+    }
+
+    // ========== 本地存储：自定义应用 ==========
+    const CUSTOM_APPS_STORE_KEY = 'customAppStoreItems';
+    function getStoredCustomApps() {
+        try { return JSON.parse(localStorage.getItem(CUSTOM_APPS_STORE_KEY) || '[]'); } catch(e) { return []; }
+    }
+    function saveCustomApps(apps) {
+        localStorage.setItem(CUSTOM_APPS_STORE_KEY, JSON.stringify(apps));
+    }
+
+    // 模式切换
+    document.getElementById('customType').addEventListener('change', function() {
+        var type = this.value;
+        document.getElementById('urlFields').style.display = type === 'url' ? 'block' : 'none';
+        document.getElementById('htmlFields').style.display = type === 'html' ? 'block' : 'none';
+    });
+
+    // 添加到 App Store（仅存本地，等待安装）
+    document.getElementById('addToStoreBtn').addEventListener('click', function() {
+        var status = document.getElementById('customStatus');
+        status.textContent = '';
+
+        var name = document.getElementById('customName').value.trim();
+        if (!name) { status.textContent = '❌ 请输入应用名称'; return; }
+
+        var type = document.getElementById('customType').value;
+        var content, iconUrl = null;
+
+        if (type === 'url') {
+            var url = document.getElementById('customUrl').value.trim();
+            if (!url) { status.textContent = '❌ 请输入网址'; return; }
+            content = url;
+            try {
+                var domain = new URL(url).hostname;
+                iconUrl = 'https://favicon.im/' + domain;
+            } catch(e) { iconUrl = null; }
+        } else {
+            var html = document.getElementById('customHtml').value.trim();
+            if (!html) { status.textContent = '❌ 请输入 HTML 代码'; return; }
+            content = html;
+            iconUrl = document.getElementById('customIconUrl').value.trim() || null;
+        }
+
+        var newId = 'custom_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        var newApp = {
+            id: newId,
+            name: name,
+            type: type,
+            content: content,
+            iconUrl: iconUrl,
+            installed: false,
+            siteUrl: null,
+            deleteToken: null
+        };
+
+        var apps = getStoredCustomApps();
+        apps.push(newApp);
+        saveCustomApps(apps);
+
+        document.getElementById('customName').value = '';
+        document.getElementById('customUrl').value = '';
+        document.getElementById('customHtml').value = '';
+        document.getElementById('customIconUrl').value = '';
+
+        status.textContent = '✅ 已添加至「我的自定义应用」，点击“获取”安装到桌面';
+        renderCustomApps();
+    });
+
+    // ========== 渲染自定义应用 ==========
+    function renderCustomApps() {
+        var container = document.getElementById('custom-apps-list');
+        var apps = getStoredCustomApps();
+
+        if (apps.length === 0) {
+            container.innerHTML = '<div style="color:#666; padding:20px;">暂无自定义应用</div>';
+            return;
+        }
+
+        var html = '';
+        apps.forEach(function(app) {
+            var iconHtml = '';
+            if (app.iconUrl) {
+                iconHtml = '<img src="' + app.iconUrl + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-globe\\\' style=\\\'font-size:48px;color:#007aff\\\'></i>\'">';
+            } else {
+                iconHtml = '<i class="fas fa-globe" style="font-size:48px; color:#007aff;"></i>';
+            }
+
+            var actionsHtml = '';
+            if (app.installed) {
+                actionsHtml = '<button class="open-btn" data-id="' + app.id + '">打开</button>' +
+                              '<button class="uninstall-btn" data-id="' + app.id + '">卸载</button>';
+            } else {
+                actionsHtml = '<button class="install-btn" data-id="' + app.id + '">获取</button>';
+            }
+
+            html += '<div class="app-card">' +
+                '<div class="app-icon">' + iconHtml + '</div>' +
+                '<div class="app-name">' + escapeHtml(app.name) + '</div>' +
+                '<div class="app-desc">' + (app.type === 'url' ? '网址模式' : 'HTML 模式') + '</div>' +
+                '<div>' + actionsHtml + '</div>' +
+            '</div>';
+        });
+        container.innerHTML = html;
+
+        // 绑定按钮事件（全部通过 postMessage）
+        container.querySelectorAll('.open-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.id;
+                // 尝试从本地记录获取站点 URL，若有则直接打开，否则发送 openApp
+                var apps = getStoredCustomApps();
+                var app = apps.find(a => a.id === id);
+                if (app && app.siteUrl) {
+                    window.open(app.siteUrl, '_blank');
+                } else {
+                    sendToParent('openApp', id);
+                }
+            });
+        });
+
+        container.querySelectorAll('.uninstall-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.id;
+                if (confirm('确定要卸载吗？将从桌面移除（不删除服务器站点）。')) {
+                    sendToParent('uninstall', id);
+                    // 乐观更新本地状态
+                    var apps = getStoredCustomApps();
+                    var app = apps.find(a => a.id === id);
+                    if (app) {
+                        app.installed = false;
+                        app.siteUrl = null;
+                        app.deleteToken = null;
+                        saveCustomApps(apps);
+                    }
+                    setTimeout(renderCustomApps, 500);
+                }
+            });
+        });
+
+        container.querySelectorAll('.install-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.id;
+                var apps = getStoredCustomApps();
+                var app = apps.find(a => a.id === id);
+                if (!app) return;
+
+                // 发送安装自定义应用请求
+                sendToParent('installCustomApp', app);
+                // 按钮禁用防止重复点击
+                btn.disabled = true;
+                btn.textContent = '安装中...';
+                setTimeout(function() { btn.disabled = false; btn.textContent = '获取'; }, 3000);
+            });
+        });
+    }
+
+    // ========== 推荐应用渲染 ==========
+    function getDomain(url) { try { return new URL(url).hostname; } catch(e) { return ''; } }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+    const APP_CATALOG = {
+        baidu: { id: 'baidu', name: '百度', url: 'https://www.baidu.com', desc: '百度搜索' },
+        bilibili: { id: 'bilibili', name: 'B站', url: 'https://www.bilibili.com', desc: '哔哩哔哩弹幕网' },
+        github: { id: 'github', name: 'GitHub', url: 'https://github.com', desc: '全球开发者社区' },
+        youtube: { id: 'youtube', name: 'YouTube', url: 'https://www.youtube.com', desc: '视频分享平台' },
+        taobao: { id: 'taobao', name: '淘宝', url: 'https://www.taobao.com', desc: '购物' },
+        jd: { id: 'jd', name: '京东', url: 'https://www.jd.com', desc: '正品好货' },
+        weibo: { id: 'weibo', name: '微博', url: 'https://weibo.com', desc: '随时随地发现新鲜事' },
+        zhihu: { id: 'zhihu', name: '知乎', url: 'https://www.zhihu.com', desc: '有问题，上知乎' }
+    };
+
+    // 向父窗口注册目录
+    sendToParent('registerApps', APP_CATALOG);
+    // 请求已安装列表
+    sendToParent('getInstalledApps');
+
+    let installedApps = [];
+
+    function renderRecommended() {
+        var container = document.getElementById('app-list');
+        if (!container) return;
+        var html = '';
+        for (var id in APP_CATALOG) {
+            var app = APP_CATALOG[id];
+            var isInstalled = installedApps.includes(id);
+            var domain = getDomain(app.url);
+            var faviconUrl = domain ? 'https://favicon.im/' + domain : '';
+            html += '<div class="app-card">' +
+                '<div class="app-icon">' + (faviconUrl ? '<img src="' + faviconUrl + '" onerror="this.onerror=null; this.parentElement.innerHTML=\'<i class=\\\'fas fa-globe\\\' style=\\\'font-size:48px;color:#007aff\\\'></i>\'">' : '<i class="fas fa-globe" style="font-size:48px;color:#007aff"></i>') + '</div>' +
+                '<div class="app-name">' + escapeHtml(app.name) + '</div>' +
+                '<div class="app-desc">' + escapeHtml(app.desc) + '</div>' +
+                '<div>' + (isInstalled ?
+                    '<button class="open-btn" data-id="' + id + '">打开</button><button class="uninstall-btn" data-id="' + id + '">移除</button>' :
+                    '<button class="install-btn" data-id="' + id + '">获取</button>') +
+                '</div></div>';
+        }
+        container.innerHTML = html;
+
+        // 绑定事件（全部 postMessage）
+        container.querySelectorAll('.install-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.id;
+                sendToParent('install', id);
+                btn.disabled = true;
+                btn.textContent = '安装中...';
+                setTimeout(function() { btn.disabled = false; btn.textContent = '获取'; }, 3000);
+            });
+        });
+        container.querySelectorAll('.open-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.id;
+                sendToParent('openApp', id);
+            });
+        });
+        container.querySelectorAll('.uninstall-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                var id = this.dataset.id;
+                if (confirm('确定移除？')) {
+                    sendToParent('uninstall', id);
+                }
+            });
+        });
+    }
+
+    // ========== 监听父窗口消息 ==========
+    window.addEventListener('message', function(e) {
+        if (e.data.type === 'appStore' && e.data.action === 'installedList') {
+            installedApps = e.data.apps || [];
+            // 同时更新自定义应用的 installed 状态（根据 appConfig 中的 id 是否在 installedApps 中）
+            var apps = getStoredCustomApps();
+            apps.forEach(function(app) {
+                app.installed = installedApps.includes(app.id);
+            });
+            saveCustomApps(apps);
+            renderRecommended();
+            renderCustomApps();
+        } else if (e.data.type === 'appStore' && e.data.action === 'customAppInstalled') {
+            // 自定义应用安装完成回调
+            var result = e.data.data;
+            if (e.data.success && result) {
+                var apps = getStoredCustomApps();
+                var app = apps.find(a => a.id === result.appId);
+                if (app) {
+                    app.installed = true;
+                    app.siteUrl = result.siteUrl;
+                    app.deleteToken = result.deleteToken;
+                    saveCustomApps(apps);
+                }
+                // 重新请求已安装列表以同步
+                sendToParent('getInstalledApps');
+            } else {
+                alert('自定义应用安装失败：' + (e.data.error || '未知错误'));
+            }
+            renderCustomApps();
+        }
+    });
+
+    // 初次渲染
+    renderRecommended();
+    renderCustomApps();
+</script>
+</body>
+</html>

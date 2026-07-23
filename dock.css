@@ -37,6 +37,7 @@
 
 .dock-panel-dynamic {
     background: rgba(255, 255, 255, 0.2);
+    height: 76px !important
     min-width: 120px;
     justify-content: center;
 }
@@ -362,4 +363,10 @@ body.dark-mode .dock-context-menu {
         transition: none !important;
         animation: none !important;
     }
+}
+#dock-panel-dynamic {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: rgba(255,255,255,0.2) !important;
 }
